@@ -2,10 +2,17 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  mode: 'development',
   entry: './src/index.js',
   devtool: 'inline-source-map',
   devServer: {
     static: './dist',
+    client: {
+      overlay: {
+        warnings: false,
+        errors: true
+      }  
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -13,16 +20,18 @@ module.exports = {
     }),
   ],
   output: {
-    filename: 'main.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },
-  rules: [
-    {
-      test: /\.css$/i,
-      use: ['style-loader', 'css-loader'],
-    },
-  ],
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
   // Uncomment if more than one entrypoint
   // optimization: {
   //   runtimeChunk: 'single',
