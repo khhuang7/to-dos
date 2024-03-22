@@ -1,0 +1,32 @@
+:root {
+  --color-dark: #12372a;
+  --color-primary: #436850;
+  --color-secondary: #ADBC9F;
+  --color-light: #FBFADA;
+  --color-shadow: #ccc;
+  --gap-small: 20px;
+  --gap-medium: 30px;
+  --gap-large: 40px;
+}
+
+* {
+  font-family: Figtree, Tahoma, sans-serif;
+}
+
+.content {
+  background-color: var(--color-light);
+  padding: var(--gap-small);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-rows: max-content;
+  grid-auto-rows: 1fr;
+  gap: var(--gap-small);
+}
+
+.content .todo-card {
+  padding: var(--gap-small);
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 2px 4px 4px var(--color-shadow);
+}
