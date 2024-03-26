@@ -38,9 +38,11 @@ function createTodo (
 }
 
 function ScreenController () {
+  const todoForm = document.forms["new-todo-form"];
+  const contentDiv = document.querySelector(".content");
+
   // load existing to-dos
   const updateTodos = function (project) {
-    const contentDiv = document.querySelector(".content");
     contentDiv.innerHTML = "";
     const todos = project.todos;
     
@@ -60,8 +62,48 @@ function ScreenController () {
     }
   }
 
+  // Submit todos
+
+  const submitTodo = function () {
+    todoForm.reportValidity();
+    var title = todoForm.title.value;
+    var description = todoForm.description.value;
+    var dueDate = todoForm.dueDate.value;
+    var priority = todoForm.priority.value;
+    let todo = createTodo(title, description, dueDate, priority);
+    defaultProject.addTodo(todo);
+
+    // clean up form and reload
+    toggleForm();
+    todoForm.reset();
+    updateTodos(defaultProject);
+  }
+
+  // Open and close form for new to-dos
+
+  const toggleForm = function () {
+    todoForm.classList.toggle("open");
+    console.log("Toggled open class");
+  }
+
+  // Assign functions to buttons
+
+  const initialize = function () {
+    const addBtn = document.querySelector(".add-btn");
+    addBtn.addEventListener("click", toggleForm);
+
+    const cancelBtn = document.querySelector(".cancel-btn");
+    cancelBtn.addEventListener("click", toggleForm);
+
+    todoForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      submitTodo();
+    });
+  }
+
   return {
     updateTodos,
+    initialize,
   }
 }
 
@@ -94,11 +136,11 @@ log(defaultProject.todos);
 // defaultProject.deleteTodo(1);
 // console.log(JSON.stringify(defaultProject.todos));
 
+ScreenController().initialize();
 ScreenController().updateTodos(defaultProject);
 
 /*
 TO DO - APPLICATION LOGIC:
-- Interface to add new todo
 - Expand a single todo to see/edit
 - Delete todo
 - Make look sexy

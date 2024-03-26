@@ -13,9 +13,32 @@
   font-family: Figtree, Tahoma, sans-serif;
 }
 
+body {
+  margin: 0;
+}
+
+button {
+  appearance: none;
+  padding: 10px 40px;
+
+  cursor: pointer;
+  font-size: inherit;
+  background-color: var(--color-secondary);
+  border: none;
+  border-radius: 15px;
+  box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
 .content {
+  z-index: -1;
   background-color: var(--color-light);
   padding: var(--gap-small);
+  box-sizing: border-box;
+  height: 100vh;
 
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -29,4 +52,114 @@
   background-color: white;
   border-radius: 15px;
   box-shadow: 2px 4px 4px var(--color-shadow);
+}
+
+.add-btn {
+  z-index: 1;
+  position: fixed;
+  bottom: var(--gap-small);
+  right: var(--gap-small);
+  transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+
+  border-radius: 1.25rem;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  height: 2.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  
+  cursor: pointer;
+  border: none;
+  box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+  background-color: var(--color-primary);
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-btn > span {
+  font-size: 1.5rem;
+  white-space: nowrap;
+  padding-left: 0.5rem;
+
+  display: none;
+}
+
+.add-btn:hover > span {
+  display: inline;
+}
+
+.add-btn:hover {
+  padding: 0 1rem;
+}
+
+form {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 100%;
+
+  opacity: 0;
+  transition: 0.5s ease;
+
+  box-sizing: border-box;
+  padding: var(--gap-medium);
+  width: max(30%, 300px);
+  height: 100%;
+
+  background-color: white;
+}
+
+form.open {
+  opacity: 1;
+  transform: translateX(-100%);
+}
+
+.form-container {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--gap-small);
+  justify-content: center;
+  align-items: baseline;
+}
+
+label {
+  justify-self: end;
+  font-weight: 700;
+}
+
+input[type="text"],
+input[type="date"],
+select {
+  margin-bottom: var(--gap-small);
+  font-family: inherit;
+  font-size: inherit;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: white;
+}
+
+/* 
+TBD IF NEEDED WITH ONLY TITLE REQUIRED
+input:invalid {
+  outline: 2px solid #8c2f20;
+}
+
+input:placeholder-shown{
+  outline: none;
+} */
+
+.form-buttons {
+  display: flex;
+  gap: var(--gap-small);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.required {
+  color: var(--color-primary);
+  font-weight: 700;
 }
