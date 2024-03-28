@@ -1,16 +1,73 @@
 import './styles.css';
 
-function createProject (title, category = null) {
-  let todos = [];
+function StorageController () {
+  const storageAvailable = function (type) {
+    let storage;
+    try {
+      storage = window[type];
+      const x = "__storage_test__";
+      storage.setItem(x, x);
+      storage.removeItem(x);
+      return true;
+    } catch (e) {
+      return (
+        e instanceof DOMException &&
+        // everything except Firefox
+        (e.code === 22 ||
+          // Firefox
+          e.code === 1014 ||
+          // test name field too, because code might not be present
+          // everything except Firefox
+          e.name === "QuotaExceededError" ||
+          // Firefox
+          e.name === "NS_ERROR_DOM_QUOTA_REACHED") &&
+        // acknowledge QuotaExceededError only if there's something already stored
+        storage &&
+        storage.length !== 0
+      );
+    }
+  }
 
-  const addTodo = function (todo) { todos.push(todo); }
-  const deleteTodo = function (index) { todos.splice(index, 1); }
+  // saveProject and readProject only involves the todos, since we only have one project (default)
+  const saveProject = function(object) {
+    let projectString = JSON.stringify(object);
+    localStorage.setItem("defaultProject", projectString);
+  }
 
-  return { title, category, todos, addTodo, deleteTodo };
+  const readProject = function() {
+    let projectString = localStorage.getItem("defaultProject");
+    let project = JSON.parse(projectString);
+    return project;
+  }
+
+  return {
+    storageAvailable,
+    saveProject,
+    readProject,
+  }
 }
 
-// Does this need to be in a separate initializing area?
-let defaultProject = createProject("Default");
+function createProject (title) {
+  let todos = [];
+
+  if (StorageController().readProject()) {
+    todos = StorageController().readProject();
+  } else {
+    StorageController().saveProject(todos);
+  }
+
+  const addTodo = function (todo) {
+    todos.push(todo);
+    StorageController().saveProject(todos);  
+  }
+
+  const deleteTodo = function (index) {
+    todos.splice(index, 1);
+    StorageController().saveProject(todos);
+  }
+
+  return { title, todos, addTodo, deleteTodo };
+}
 
 function createTodo (
   title,
@@ -83,12 +140,10 @@ function ScreenController () {
 
   const toggleForm = function () {
     todoForm.classList.toggle("open");
-    console.log("Toggled open class");
   }
 
-  // Assign functions to buttons
-
   const initialize = function () {
+    // Assign functions to buttons
     const addBtn = document.querySelector(".add-btn");
     addBtn.addEventListener("click", toggleForm);
 
@@ -99,6 +154,11 @@ function ScreenController () {
       event.preventDefault();
       submitTodo();
     });
+
+    // Test storage controller
+    if (!StorageController().storageAvailable("localStorage")) {
+      alert("Local storage is disabled or not available. This website may not function correctly.");
+    }
   }
 
   return {
@@ -108,30 +168,44 @@ function ScreenController () {
 }
 
 // TESTING
+// Does this need to be in a separate initializing area?
+
+let defaultProject = createProject("Default");
+
 function log(text) {
   console.log(JSON.stringify(text));
 }
 log(defaultProject);
-let testTodo = createTodo("Test todos", "Try out different functions");
-defaultProject.addTodo(testTodo);
-log(testTodo.getDueDate());
-log("change due date");
-testTodo.setDueDate("2024/04/30");
-log(defaultProject.todos);
-log(testTodo.getDueDate());
-log("change title and completed");
-testTodo.title = "Test todos including title change";
-testTodo.toggleCompleted();
-log(defaultProject.todos);
+console.log(StorageController().readProject("defaultProject"));
 
-log("add new todo with date");
-let testDate = createTodo("Test dates",
-  "Check formatting for dates",
-  "2024/03/31");
-defaultProject.addTodo(testDate);
-log(testDate);
-log(testDate.getDueDate());
-log(defaultProject.todos);
+// console.log("delete todo");
+// defaultProject.deleteTodo(2);
+// console.log(StorageController().readProject("defaultProject"));
+
+// let testTodo = createTodo("Persist data in local storage",
+// "JS logic - test saveProject and readProject - https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API");
+// defaultProject.addTodo(testTodo);
+// log(testTodo.getDueDate());
+// log("change due date");
+// testTodo.setDueDate("2024/04/30");
+// log(defaultProject.todos);
+// log(testTodo.getDueDate());
+// log("change title and completed");
+// testTodo.title = "Test todos including title change";
+// testTodo.toggleCompleted();
+// log(defaultProject.todos);
+
+// console.log("add new todo with date");
+// let testDate = createTodo("Organise to-dos by date",
+//   "JS logic",
+//   "2024/03/31");
+// defaultProject.addTodo(testDate);
+// log(testDate);
+// log(testDate.getDueDate());
+// defaultProject.addTodo(createTodo("Make sure app doesn't crash if data is missing", "JS logic"));
+
+// log(defaultProject.todos);
+// console.log(StorageController().readProject("defaultProject"));
 
 // defaultProject.deleteTodo(1);
 // console.log(JSON.stringify(defaultProject.todos));
@@ -147,8 +221,5 @@ TO DO - APPLICATION LOGIC:
 - Create different project views
 - Add menu bar with all projects
 - Add calendar views
-
-TO DO - JS LOGIC:
-- Persist data in local storage https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
-- Make sure app doesn't crash if data is missing
+- Add categories of projects (e.g. personal, work)
 */
