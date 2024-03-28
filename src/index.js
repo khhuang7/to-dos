@@ -1,52 +1,78 @@
 import './styles.css';
 import * as storage from './StorageController.js';
-import * as screen from './ScreenController.js';
+import { createProject, createTodo } from './todos.js';
 
-function createProject (title) {
-  let todos = [];
+function ScreenController () {
+  const todoForm = document.forms["new-todo-form"];
+  const contentDiv = document.querySelector(".content");
 
-  if (storage.readProject(title)) {
-    todos = storage.readProject(title);
-  } else {
-    storage.saveProject(title, todos);
+  // load existing to-dos
+  const updateTodos = function (project) {
+    contentDiv.innerHTML = "";
+    const todos = project.todos;
+    
+    for (let todo of todos) {
+      const card = document.createElement("div");
+      card.classList.add("todo-card");
+
+      const cardTitle = document.createElement("h3");
+      cardTitle.innerText = todo.title;
+      card.appendChild(cardTitle);
+
+      const cardDescription = document.createElement("p");
+      cardDescription.innerText = todo.description;
+      card.appendChild(cardDescription);
+
+      contentDiv.appendChild(card);
+    }
   }
 
-  const addTodo = function (todo) {
-    todos.push(todo);
-    storage.saveProject(title, todos);  
+  // Submit todos
+
+  const submitTodo = function () {
+    todoForm.reportValidity();
+    var title = todoForm.title.value;
+    var description = todoForm.description.value;
+    var dueDate = todoForm.dueDate.value;
+    var priority = todoForm.priority.value;
+    let todo = createTodo(title, description, dueDate, priority);
+    defaultProject.addTodo(todo);
+
+    // clean up form and reload
+    toggleForm();
+    todoForm.reset();
+    updateTodos(defaultProject);
   }
 
-  const deleteTodo = function (index) {
-    todos.splice(index, 1);
-    storage.saveProject(title, todos);
+  // Open and close form for new to-dos
+
+  const toggleForm = function () {
+    todoForm.classList.toggle("open");
   }
 
-  return { title, todos, addTodo, deleteTodo };
-}
+  const initialize = function () {
+    // Assign functions to buttons
+    const addBtn = document.querySelector(".add-btn");
+    addBtn.addEventListener("click", toggleForm);
 
-function createTodo (
-  title,
-  description,
-  date = null,
-  priority = null
-) {
-  let dueDate;
-  const setDueDate = (newDate) => {
-    dueDate = (newDate === null) ? null : new Date(newDate);
+    const cancelBtn = document.querySelector(".cancel-btn");
+    cancelBtn.addEventListener("click", toggleForm);
+
+    todoForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      submitTodo();
+    });
+
+    // Test storage controller
+    if (!storage.storageAvailable("localStorage")) {
+      alert("Local storage is disabled or not available. This website may not function correctly.");
+    }
   }
-  setDueDate(date);
-  
-  let completed = false;
 
   return {
-    title,
-    description,
-    priority,
-    completed,
-    getDueDate: function () { return dueDate; },
-    setDueDate,
-    toggleCompleted: function () { this.completed = !this.completed; },
-  };
+    updateTodos,
+    initialize,
+  }
 }
 
 // TESTING
@@ -92,8 +118,8 @@ console.log(storage.readProject("Default"));
 // defaultProject.deleteTodo(1);
 // console.log(JSON.stringify(defaultProject.todos));
 
-screen.initialize();
-screen.updateTodos(defaultProject);
+ScreenController().initialize();
+ScreenController().updateTodos(defaultProject);
 
 /*
 TO DO - APPLICATION LOGIC:
