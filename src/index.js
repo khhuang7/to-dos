@@ -29,13 +29,13 @@ function StorageController () {
   }
 
   // saveProject and readProject only involves the todos, since we only have one project (default)
-  const saveProject = function(object) {
-    let projectString = JSON.stringify(object);
-    localStorage.setItem("defaultProject", projectString);
+  const saveProject = function(title, todos) {
+    let projectString = JSON.stringify(todos);
+    localStorage.setItem(title, projectString);
   }
 
-  const readProject = function() {
-    let projectString = localStorage.getItem("defaultProject");
+  const readProject = function(title) {
+    let projectString = localStorage.getItem(title);
     let project = JSON.parse(projectString);
     return project;
   }
@@ -50,20 +50,20 @@ function StorageController () {
 function createProject (title) {
   let todos = [];
 
-  if (StorageController().readProject()) {
-    todos = StorageController().readProject();
+  if (StorageController().readProject(title)) {
+    todos = StorageController().readProject(title);
   } else {
-    StorageController().saveProject(todos);
+    StorageController().saveProject(title, todos);
   }
 
   const addTodo = function (todo) {
     todos.push(todo);
-    StorageController().saveProject(todos);  
+    StorageController().saveProject(title, todos);  
   }
 
   const deleteTodo = function (index) {
     todos.splice(index, 1);
-    StorageController().saveProject(todos);
+    StorageController().saveProject(title, todos);
   }
 
   return { title, todos, addTodo, deleteTodo };
@@ -176,11 +176,11 @@ function log(text) {
   console.log(JSON.stringify(text));
 }
 log(defaultProject);
-console.log(StorageController().readProject("defaultProject"));
+console.log(StorageController().readProject("Default"));
 
 // console.log("delete todo");
 // defaultProject.deleteTodo(2);
-// console.log(StorageController().readProject("defaultProject"));
+// console.log(StorageController().readProject("Default"));
 
 // let testTodo = createTodo("Persist data in local storage",
 // "JS logic - test saveProject and readProject - https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API");
@@ -205,7 +205,7 @@ console.log(StorageController().readProject("defaultProject"));
 // defaultProject.addTodo(createTodo("Make sure app doesn't crash if data is missing", "JS logic"));
 
 // log(defaultProject.todos);
-// console.log(StorageController().readProject("defaultProject"));
+// console.log(StorageController().readProject("Default"));
 
 // defaultProject.deleteTodo(1);
 // console.log(JSON.stringify(defaultProject.todos));
