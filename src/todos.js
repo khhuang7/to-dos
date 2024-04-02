@@ -17,6 +17,7 @@ function createProject (title) {
   const deleteTodo = function (index) {
     todos.splice(index, 1);
     storage.saveProject(title, todos);
+    console.log(`Deleted index ${index}`);
   }
 
   return { title, todos, addTodo, deleteTodo };

@@ -30,6 +30,17 @@ module.exports = {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|svg)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192
+            }
+          }
+        ],
+      }
     ],
   },
   // Uncomment if more than one entrypoint

@@ -42,16 +42,33 @@ button:hover {
 
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  grid-template-rows: max-content;
-  grid-auto-rows: 1fr;
+  grid-auto-rows: max-content;
   gap: var(--gap-small);
 }
 
-.content .todo-card {
+.todo-card {
   padding: var(--gap-small);
   background-color: white;
   border-radius: 15px;
   box-shadow: 2px 4px 4px var(--color-shadow);
+
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.todo-card h3,
+.todo-card p {
+  margin-top: 0;
+}
+
+.card-button {
+  justify-self: end;
+  padding: 5px;
+}
+
+.card-button img {
+  max-height: 15px;
+  vertical-align: middle;
 }
 
 .add-btn {
