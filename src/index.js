@@ -1,7 +1,7 @@
 import './styles.css';
 import * as storage from './StorageController.js';
 import { createProject, createTodo } from './todos.js';
-import { format, compareAsc } from 'date-fns';
+import { format, compareAsc, parseISO } from 'date-fns';
 import TrashCan from './trash-can-10416.svg';
 
 function ScreenController () {
@@ -26,7 +26,7 @@ function ScreenController () {
         const cardDueDate = document.createElement("p");
         cardDueDate.classList.add("due-date");
         if (compareAsc(dueDate, new Date()) === -1) { cardDueDate.classList.add("overdue"); }
-        const dueDateFormatted = format(todo.getDueDate(), "d MMM");
+        const dueDateFormatted = format(parseISO(dueDate), "d MMM");
         cardDueDate.innerText = dueDateFormatted;
         card.appendChild(cardDueDate);  
       }
@@ -123,12 +123,17 @@ ScreenController().updateTodos(defaultProject);
 /*
 TO DO - APPLICATION LOGIC:
 - Expand a single todo to see/edit
-- Add menu bar with all projects
+- Add menu bar with all projects (remove mentions of "defaultProject")
+-  // Set minimum due date to today
+    dueDateInput.min = new Date().toISOString().split("T")[0];
 
 NICE TO HAVE - APP LOGIC:
+- Ability to tick off completed items
+- Separate list for completed items
 - Make cards the same size, with overflow text
 - Create different project views
 - Make look sexy
+  - Same width buttons in form
   - Card sizing to maximise screen width with sufficient cards
 - Add calendar views
 - Add categories of projects (e.g. personal, work)

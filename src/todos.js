@@ -1,4 +1,5 @@
 import * as storage from './StorageController.js';
+import { format, parseISO } from 'date-fns';
 
 function createProject (project) {
   let todos = [];
@@ -52,7 +53,7 @@ function createTodo (
 ) {
   let dueDate;
   const setDueDate = (newDate) => {
-    dueDate = (Boolean(newDate)) ? new Date(newDate) : null;
+    dueDate = (Boolean(newDate)) ? format(parseISO(newDate), "yyyy-MM-dd") : null;
     return dueDate;
   }
   setDueDate(date);
