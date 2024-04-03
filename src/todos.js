@@ -1,26 +1,47 @@
 import * as storage from './StorageController.js';
 
-function createProject (title) {
+function createProject (project) {
   let todos = [];
 
-  if (storage.readProject(title)) {
-    todos = storage.readProject(title);
+  if (storage.readProject(project)) {
+    let todoBasics = storage.readProject(project);
+    for (const item of todoBasics) {
+      let todo = createTodo(
+        item.title,
+        item.description,
+        item.dueDate,
+        item.priority);
+      todos.push(todo);
+    }
   } else {
-    storage.saveProject(title, todos);
+    storage.saveProject(project, todos);
+  }
+
+  const getBasics = function () {
+    let todoBasics = [];
+    for (const todo of todos) {
+      const title = todo.title;
+      const description = todo.description;
+      const dueDate = todo.getDueDate();
+      const priority = todo.priority;
+      todoBasics.push({title, description, dueDate, priority});
+    }
+    return todoBasics;
   }
 
   const addTodo = function (todo) {
     todos.push(todo);
-    storage.saveProject(title, todos);  
+    let todoBasics = getBasics();
+    storage.saveProject(project, todoBasics);
   }
 
   const deleteTodo = function (index) {
     todos.splice(index, 1);
-    storage.saveProject(title, todos);
-    console.log(`Deleted index ${index}`);
+    let todoBasics = getBasics();
+    storage.saveProject(project, todoBasics);
   }
 
-  return { title, todos, addTodo, deleteTodo };
+  return { project, todos, addTodo, deleteTodo };
 }
 
 function createTodo (
@@ -31,7 +52,8 @@ function createTodo (
 ) {
   let dueDate;
   const setDueDate = (newDate) => {
-    dueDate = (newDate === null) ? null : new Date(newDate);
+    dueDate = (Boolean(newDate)) ? new Date(newDate) : null;
+    return dueDate;
   }
   setDueDate(date);
   
@@ -42,7 +64,9 @@ function createTodo (
     description,
     priority,
     completed,
-    getDueDate: function () { return dueDate; },
+    getDueDate: function () {
+      return dueDate; 
+    },
     setDueDate,
     toggleCompleted: function () { this.completed = !this.completed; },
   };

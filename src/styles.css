@@ -41,7 +41,7 @@ button:hover {
   height: 100vh;
 
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, clamp(300px, 30%, 400px));
   grid-auto-rows: max-content;
   gap: var(--gap-small);
 }
@@ -56,9 +56,20 @@ button:hover {
   grid-template-rows: auto 1fr auto;
 }
 
-.todo-card h3,
+.todo-card h3 {
+  margin: 0;
+}
+
 .todo-card p {
   margin-top: 0;
+}
+
+.due-date {
+  color: #aaa;
+}
+
+.overdue {
+  color: red;
 }
 
 .card-button {

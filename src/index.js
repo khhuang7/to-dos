@@ -1,6 +1,7 @@
 import './styles.css';
 import * as storage from './StorageController.js';
 import { createProject, createTodo } from './todos.js';
+import { format, compareAsc } from 'date-fns';
 import TrashCan from './trash-can-10416.svg';
 
 function ScreenController () {
@@ -19,6 +20,16 @@ function ScreenController () {
       const cardTitle = document.createElement("h3");
       cardTitle.innerText = todo.title;
       card.appendChild(cardTitle);
+
+      const dueDate = todo.getDueDate();
+      if (dueDate !== null) {
+        const cardDueDate = document.createElement("p");
+        cardDueDate.classList.add("due-date");
+        if (compareAsc(dueDate, new Date()) === -1) { cardDueDate.classList.add("overdue"); }
+        const dueDateFormatted = format(todo.getDueDate(), "d MMM");
+        cardDueDate.innerText = dueDateFormatted;
+        card.appendChild(cardDueDate);  
+      }
 
       const cardDescription = document.createElement("p");
       cardDescription.innerText = todo.description;
@@ -112,10 +123,13 @@ ScreenController().updateTodos(defaultProject);
 /*
 TO DO - APPLICATION LOGIC:
 - Expand a single todo to see/edit
-- Make cards the same size, with overflow text
-- Make look sexy
-- Create different project views
 - Add menu bar with all projects
+
+NICE TO HAVE - APP LOGIC:
+- Make cards the same size, with overflow text
+- Create different project views
+- Make look sexy
+  - Card sizing to maximise screen width with sufficient cards
 - Add calendar views
 - Add categories of projects (e.g. personal, work)
 - Add web.config to stop 404 error with Font Awesome woff https://hotcakescommerce.zendesk.com/hc/en-us/articles/210926903-HTTP-404-Not-Found-Error-with-woff-or-woff2-Font-Files

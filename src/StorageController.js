@@ -26,13 +26,16 @@ const storageAvailable = function (type) {
 }
 
 // saveProject and readProject only involves the todos, since we only have one project (default)
-const saveProject = function(title, todos) {
-  let projectString = JSON.stringify(todos);
-  localStorage.setItem(title, projectString);
+const saveProject = function(projectName, todoBasics) {
+  console.log("Saving project");
+  let projectString = JSON.stringify(todoBasics);
+  localStorage.setItem(projectName, projectString);
+  console.log(projectName);
+  console.log(localStorage.getItem(projectName));
 }
 
-const readProject = function(title) {
-  let projectString = localStorage.getItem(title);
+const readProject = function(projectName) {
+  let projectString = localStorage.getItem(projectName);
   let project = JSON.parse(projectString);
   return project;
 }
