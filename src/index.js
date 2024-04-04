@@ -6,7 +6,10 @@ import TrashCan from './trash-can-10416.svg';
 
 function ScreenController () {
   const todoForm = document.forms["new-todo-form"];
+  const submitBtn = document.querySelector(".submit-btn");
   const contentDiv = document.querySelector(".content");
+  let formMode = "";
+  let currentTodo = "";
 
   // load existing to-dos
   const updateTodos = function (project) {
@@ -16,6 +19,7 @@ function ScreenController () {
     todos.forEach(function (todo, i) {
       const card = document.createElement("div");
       card.classList.add("todo-card");
+      card.addEventListener("click", openEditForm.bind(window, project, i));
 
       const cardTitle = document.createElement("h3");
       cardTitle.innerText = todo.title;
@@ -40,31 +44,85 @@ function ScreenController () {
       const trashIcon = new Image();
       trashIcon.src = TrashCan;
       cardButton.appendChild(trashIcon);
-      cardButton.addEventListener("click", () => removeTodo(project, i));
+      cardButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        removeTodo(project, i);
+      });
       card.appendChild(cardButton);
 
       contentDiv.appendChild(card);
     })
   }
 
-  // Submit todos
+  // Open form to create new to-do
 
-  const submitTodo = function () {
-    todoForm.reportValidity();
-    var title = todoForm.title.value;
-    var description = todoForm.description.value;
-    var dueDate = todoForm.dueDate.value;
-    var priority = todoForm.priority.value;
-    let todo = createTodo(title, description, dueDate, priority);
-    defaultProject.addTodo(todo);
-
-    // clean up form and reload
-    toggleForm();
+  const openNewForm  = function () {
+    submitBtn.innerText = "Add new task";
+    formMode = "add";
     todoForm.reset();
+
+    toggleForm();
+  }
+
+  const openEditForm  = function (project, index) {
+    // BUGS - CURRENTTODO AND FORMMODE DON'T PERSIST IF CARD IS CLICKED AT BEGINNING, passing function into addeventlistener with parameters
+    console.log("Open edit form");
+    console.log({project, index});
+    currentTodo = project.todos[index];
+    todoForm.title.value = currentTodo.title;
+    todoForm.description.value = currentTodo.description;
+    todoForm.dueDate.value = currentTodo.getDueDate();
+    todoForm.priority.value = currentTodo.priority;
+    
+    submitBtn.innerText = "Save task";
+    formMode = "edit";
+    console.log(formMode);
+    toggleForm();
+  }
+
+  ///////// Open form to edit existing to-do
+
+  // Submit form depending if it is a new or existing to-do
+
+  const submitForm = function () {
+    todoForm.reportValidity();
+
+    console.log(formMode);
+    switch (formMode) {
+      case "add":
+        submitTodo();
+        break;
+      case "edit":
+        editTodo(currentTodo);
+        break;
+    }
+
+    toggleForm();
     updateTodos(defaultProject);
   }
 
-  // Open and close form for new to-dos
+  // Submit new to-do
+
+  const submitTodo = function () {
+    let title = todoForm.title.value;
+    let description = todoForm.description.value;
+    let dueDate = todoForm.dueDate.value;
+    let priority = todoForm.priority.value;
+    let todo = createTodo(title, description, dueDate, priority);
+    defaultProject.addTodo(todo);
+  }
+
+  // Edit existing to-do
+  const editTodo = function(todo) {
+    let title = todoForm.title.value;
+    let description = todoForm.description.value;
+    let dueDate = todoForm.dueDate.value;
+    let priority = todoForm.priority.value;
+
+    defaultProject.updateTodo(todo, title, description, dueDate, priority);
+  }
+
+  // Open and close form
 
   const toggleForm = function () {
     todoForm.classList.toggle("open");
@@ -79,15 +137,15 @@ function ScreenController () {
   const initialize = function () {
     // Assign functions to buttons
     const addBtn = document.querySelector(".add-btn");
-    addBtn.addEventListener("click", toggleForm);
-
-    const cancelBtn = document.querySelector(".cancel-btn");
-    cancelBtn.addEventListener("click", toggleForm);
+    addBtn.addEventListener("click", openNewForm);
 
     todoForm.addEventListener("submit", function(event) {
       event.preventDefault();
-      submitTodo();
+      submitForm();
     });
+
+    const cancelBtn = document.querySelector(".cancel-btn");
+    cancelBtn.addEventListener("click", toggleForm);
 
     // Test storage controller
     if (!storage.storageAvailable("localStorage")) {
@@ -114,20 +172,18 @@ function log(text) {
 log(defaultProject);
 console.log(storage.readProject("Default"));
 
-// console.log("delete todo");
-// defaultProject.deleteTodo(2);
-// console.log(storage.readProject("Default"));
-
 ScreenController().updateTodos(defaultProject);
 
 /*
 TO DO - APPLICATION LOGIC:
-- Expand a single todo to see/edit
 - Add menu bar with all projects (remove mentions of "defaultProject")
 -  // Set minimum due date to today
     dueDateInput.min = new Date().toISOString().split("T")[0];
+- Fix bug when editing an existing card on first click
 
 NICE TO HAVE - APP LOGIC:
+- Change edit function to be within the individual card, instead of same to-do form
+- Figure out how to fix the bug where if formMode is initially set to "", it is not rewritten as "edit" if clicking on a card to open the form for the first time
 - Ability to tick off completed items
 - Separate list for completed items
 - Make cards the same size, with overflow text

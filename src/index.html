@@ -14,7 +14,7 @@
       <input id="title" type="text" name="title" placeholder=" " required aria-describedby="required-description">
       
       <label for="description">Description</label>
-      <input id="description" type="text" name="description" placeholder=" ">
+      <textarea id="description" name="description" placeholder=" " rows="4" form="new-todo-form"></textarea>
       
       <label for="due-date">Due</label>
       <input id="due-date" type="date" name="dueDate">
@@ -29,7 +29,7 @@
     </div>
 
     <div class="form-buttons">
-      <button class="submit-todo-btn">Add task</button>
+      <button class="submit-btn" type="submit"></button>
       <button class="cancel-btn" type="button">Cancel</button>
     </div>
 

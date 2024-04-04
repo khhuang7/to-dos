@@ -36,13 +36,27 @@ function createProject (project) {
     storage.saveProject(project, todoBasics);
   }
 
+  const updateTodo = function(
+    todo,
+    newTitle,
+    newDescription,
+    newDueDate,
+    newPriority) {
+      todo.title = newTitle;
+      todo.description = newDescription;
+      todo.setDueDate(newDueDate);
+      todo.priority = newPriority;
+    let todoBasics = getBasics();
+    storage.saveProject(project, todoBasics);
+  }
+
   const deleteTodo = function (index) {
     todos.splice(index, 1);
     let todoBasics = getBasics();
     storage.saveProject(project, todoBasics);
   }
 
-  return { project, todos, addTodo, deleteTodo };
+  return { project, todos, addTodo, updateTodo, deleteTodo };
 }
 
 function createTodo (

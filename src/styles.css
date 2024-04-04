@@ -159,6 +159,7 @@ label {
 }
 
 input[type="text"],
+textarea,
 input[type="date"],
 select {
   margin-bottom: var(--gap-small);
