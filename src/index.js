@@ -72,8 +72,6 @@ function ScreenController () {
 
   const openEditForm  = function (project, index) {
     // BUGS - CURRENTTODO AND FORMMODE DON'T PERSIST IF CARD IS CLICKED AT BEGINNING, passing function into addeventlistener with parameters
-    console.log("Open edit form");
-    console.log({project, index});
     currentTodo = project.todos[index];
     todoForm.title.value = currentTodo.title;
     todoForm.description.value = currentTodo.description;
@@ -82,7 +80,6 @@ function ScreenController () {
     
     submitBtn.innerText = "Save task";
     formMode = "edit";
-    console.log(formMode);
     toggleForm();
   }
 
@@ -93,7 +90,6 @@ function ScreenController () {
   const submitForm = function () {
     todoForm.reportValidity();
 
-    console.log(formMode);
     switch (formMode) {
       case "add":
         submitTodo();
@@ -148,7 +144,12 @@ function ScreenController () {
   }
 
   const initialize = function () {
-    // ADD LIST OF PROJECTS TO MENU
+    // Test storage controller
+    if (!storage.storageAvailable("localStorage")) {
+      alert("Local storage is disabled or not available. This website may not function correctly.");
+    }
+    
+    // Add list of projects to menu
     const projects = storage.getProjectNames();
     for (const project of projects) {
       const projectLink = document.createElement("li");
@@ -169,51 +170,40 @@ function ScreenController () {
     const cancelBtn = document.querySelector(".cancel-btn");
     cancelBtn.addEventListener("click", toggleForm);
 
-    // Test storage controller
-    if (!storage.storageAvailable("localStorage")) {
-      alert("Local storage is disabled or not available. This website may not function correctly.");
-    }
+    // Load default project
+    currentProject = openProject("Default");
+    updateTodos(currentProject);
   }
 
   return {
-    updateTodos,
-    initialize,
+    initialize
   }
 }
 
 ScreenController().initialize();
 
-// TESTING
-// Does this need to be in a separate initializing area?
-
-let currentProject = openProject("Default");
-
-function log(text) {
-  console.log(JSON.stringify(text));
-}
-log(currentProject);
-
-ScreenController().updateTodos(currentProject);
-
 /*
 TO DO - APPLICATION LOGIC:
-- Add menu bar with all projects
 -  // Set minimum due date to today
     dueDateInput.min = new Date().toISOString().split("T")[0];
-- Fix bug when editing an existing card on first click
+- Fix bug when editing an existing card on first click (if formMode is initially set to "", it is not rewritten as "edit" if clicking on a card to open the form for the first time)
 
-NICE TO HAVE - APP LOGIC:
-- Change edit function to be within the individual card, instead of same to-do form
-- Figure out how to fix the bug where if formMode is initially set to "", it is not rewritten as "edit" if clicking on a card to open the form for the first time
-- Ability to tick off completed items
-- Separate list for completed items
-- Make cards the same size, with overflow text
-- Create different project views
+NICE TO HAVE - EASIER:
+- Ability to choose default project
+- Create project
+- Rename project
+- Flag for priorities
 - Make look sexy
   - Same width buttons in form
+  - Make cards the same size, with overflow text
   - Card sizing to maximise screen width with sufficient cards
   - Add placeholder space for date when not provided
+- Ability to tick off completed items
+
+NICE TO HAVE - MORE COMPLEX:
+- Change edit function to be within the individual card, instead of same to-do form
+- Create different project views
+- Separate list for completed items
 - Add calendar views
 - Add categories of projects (e.g. personal, work)
-- Add web.config to stop 404 error with Font Awesome woff https://hotcakescommerce.zendesk.com/hc/en-us/articles/210926903-HTTP-404-Not-Found-Error-with-woff-or-woff2-Font-Files
 */
