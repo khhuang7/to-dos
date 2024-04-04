@@ -1,7 +1,8 @@
 import * as storage from './StorageController.js';
 import { format, parseISO } from 'date-fns';
 
-function createProject (project) {
+function openProject (project) {
+  let name = project;
   let todos = [];
 
   if (storage.readProject(project)) {
@@ -56,7 +57,13 @@ function createProject (project) {
     storage.saveProject(project, todoBasics);
   }
 
-  return { project, todos, addTodo, updateTodo, deleteTodo };
+  return {
+    name,
+    todos,
+    addTodo,
+    updateTodo,
+    deleteTodo
+  };
 }
 
 function createTodo (
@@ -88,6 +95,6 @@ function createTodo (
 }
 
 export {
-  createProject,
+  openProject,
   createTodo,
 }

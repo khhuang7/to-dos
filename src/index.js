@@ -1,6 +1,6 @@
 import './styles.css';
 import * as storage from './StorageController.js';
-import { createProject, createTodo } from './todos.js';
+import { openProject, createTodo } from './todos.js';
 import { format, compareAsc, parseISO } from 'date-fns';
 import TrashCan from './trash-can-10416.svg';
 
@@ -8,14 +8,20 @@ function ScreenController () {
   const todoForm = document.forms["new-todo-form"];
   const submitBtn = document.querySelector(".submit-btn");
   const contentDiv = document.querySelector(".content");
-  let formMode = "";
-  let currentTodo = "";
+  const projectMenu = document.querySelector(".project-menu");
+  let formMode;
+  let currentTodo;
+  let currentProject;
 
   // load existing to-dos
   const updateTodos = function (project) {
     contentDiv.innerHTML = "";
     const todos = project.todos;
     
+    const projectTitle = document.createElement("h2");
+    projectTitle.innerText = project.name;
+    contentDiv.appendChild(projectTitle);
+
     todos.forEach(function (todo, i) {
       const card = document.createElement("div");
       card.classList.add("todo-card");
@@ -98,7 +104,7 @@ function ScreenController () {
     }
 
     toggleForm();
-    updateTodos(defaultProject);
+    updateTodos(currentProject);
   }
 
   // Submit new to-do
@@ -109,7 +115,7 @@ function ScreenController () {
     let dueDate = todoForm.dueDate.value;
     let priority = todoForm.priority.value;
     let todo = createTodo(title, description, dueDate, priority);
-    defaultProject.addTodo(todo);
+    currentProject.addTodo(todo);
   }
 
   // Edit existing to-do
@@ -119,7 +125,7 @@ function ScreenController () {
     let dueDate = todoForm.dueDate.value;
     let priority = todoForm.priority.value;
 
-    defaultProject.updateTodo(todo, title, description, dueDate, priority);
+    currentProject.updateTodo(todo, title, description, dueDate, priority);
   }
 
   // Open and close form
@@ -134,7 +140,23 @@ function ScreenController () {
     updateTodos(project);
   }
 
+  // Change project in view
+  const switchProject = function (event) {
+    const projectName = event.target.innerText;
+    currentProject = openProject(projectName);
+    updateTodos(currentProject);
+  }
+
   const initialize = function () {
+    // ADD LIST OF PROJECTS TO MENU
+    const projects = storage.getProjectNames();
+    for (const project of projects) {
+      const projectLink = document.createElement("li");
+      projectLink.innerText = project;
+      projectLink.addEventListener("click", switchProject);
+      projectMenu.appendChild(projectLink);
+    }
+
     // Assign functions to buttons
     const addBtn = document.querySelector(".add-btn");
     addBtn.addEventListener("click", openNewForm);
@@ -164,19 +186,18 @@ ScreenController().initialize();
 // TESTING
 // Does this need to be in a separate initializing area?
 
-let defaultProject = createProject("Default");
+let currentProject = openProject("Default");
 
 function log(text) {
   console.log(JSON.stringify(text));
 }
-log(defaultProject);
-console.log(storage.readProject("Default"));
+log(currentProject);
 
-ScreenController().updateTodos(defaultProject);
+ScreenController().updateTodos(currentProject);
 
 /*
 TO DO - APPLICATION LOGIC:
-- Add menu bar with all projects (remove mentions of "defaultProject")
+- Add menu bar with all projects
 -  // Set minimum due date to today
     dueDateInput.min = new Date().toISOString().split("T")[0];
 - Fix bug when editing an existing card on first click
@@ -191,6 +212,7 @@ NICE TO HAVE - APP LOGIC:
 - Make look sexy
   - Same width buttons in form
   - Card sizing to maximise screen width with sufficient cards
+  - Add placeholder space for date when not provided
 - Add calendar views
 - Add categories of projects (e.g. personal, work)
 - Add web.config to stop 404 error with Font Awesome woff https://hotcakescommerce.zendesk.com/hc/en-us/articles/210926903-HTTP-404-Not-Found-Error-with-woff-or-woff2-Font-Files

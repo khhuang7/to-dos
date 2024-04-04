@@ -15,6 +15,47 @@
 
 body {
   margin: 0;
+
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) 4fr;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.sidebar {
+  background-color: var(--color-dark);
+}
+
+.menu {
+  list-style-type: none;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 0;
+  margin-top: var(--gap-small);
+  margin-bottom: var(--gap-large);
+  margin-left: var(--gap-small);
+}
+
+.menu li {
+  list-style-type: none;
+  margin-bottom: var(--gap-small);
+}
+
+.menu a {
+  text-decoration: none;
+  color: white;
+}
+
+.menu > ul {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.project-menu > li {
+  cursor: pointer;
 }
 
 button {
@@ -44,6 +85,10 @@ button:hover {
   grid-template-columns: repeat(auto-fit, clamp(300px, 30%, 400px));
   grid-auto-rows: max-content;
   gap: var(--gap-small);
+}
+
+.content h2 {
+  grid-column: 1 / -1;
 }
 
 .todo-card {

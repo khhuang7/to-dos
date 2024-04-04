@@ -40,8 +40,13 @@ const readProject = function(projectName) {
   return project;
 }
 
+const getProjectNames = function() {
+  return Object.keys({...localStorage});
+}
+
 export {
   storageAvailable,
   saveProject,
   readProject,
+  getProjectNames,
 }
